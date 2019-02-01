@@ -25,6 +25,7 @@ BuildTap("copyGUI", "Display Copy Macros", 55, 210, 205, 30)
 Gui, Tab, 2
 BuildTap("Spam", "Spam", 55, 50, 205, 30)
 BuildTap("Cypher", "Cypher", 55, 90, 205, 30)
+BuildButton("Test", "Test Script", 55, 130, 205, 30)
 
 Gui, Tab, 3
 Gui, Add, Text,, Search Settings
@@ -122,6 +123,19 @@ CypherOn:
     Tap("Cypher", "\scripts")
     return 
 }
+;----------------------------------- TEST BUTTON -------------------------------------------------------------------------------------------------------------
+TestOn:
+{
+    OnButton("Test", "\scripts")
+    return
+}
+
+TestOff:
+{
+    OffButton("Test", "\scripts")
+    return 
+}
+
 ;----------------------------------- SETTINGS TAB  -------------------------------------------------------------------------------------------------------------
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;----------------------------------- SEND RIGHT SETTING -------------------------------------------------------------------------------------------------------------
@@ -206,7 +220,7 @@ ExitApp
 CheckForScript() {
 	if WinExist("mainscript.ahk")
 	{
-		Tap("mainscript", "\scripts")
+		Tap("searchkey", "\scripts\auxillary")
 		return 
 	}
 }

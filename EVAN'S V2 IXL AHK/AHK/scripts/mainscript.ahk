@@ -3,11 +3,15 @@
 #Include %A_WorkingDir%\lib\ixlsearch.ahk 
 #IfWinNotExist, `%A_ScriptDir`%\auxillary\CopyMacros.ahk
 {
-	Run, %A_ScriptDir%\auxillary\CopyMacros.ahk 
+	Run, %A_ScriptDir%\auxillary\CopyMacros.ahk  
 }
 #IfWinNotExist, `%A_ScriptDir`%\auxillary\ExcelHotkeys.ahk 
 {
 	Run, %A_ScriptDir%\auxillary\ExcelHotkeys.ahk 
+}
+#IfWinNotExist, `%A_ScriptDir`%\auxillary\searchkey.ahk 
+{
+  Run, %A_ScriptDir%\auxillary\searchkey.ahk 
 }
 
 OnExit("ExitFunc")
@@ -16,13 +20,9 @@ ExitFunc() {
 	DetectHiddenWindows, On 
 	WinClose, %A_ScriptDir%\auxillary\CopyMacros.ahk ahk_class AutoHotkey
 	WinClose, %A_ScriptDir%\auxillary\ExcelHotkeys.ahk ahk_class AutoHotkey 
+  WinClose, %A_ScriptDir%\auxillary\searchkey.ahk ahk_class AutoHotkey
 	return 
 }
-
-EnvGet, nw, new_window
-EnvGet, sendr, sr 
-EnvGet, subm, sm 
-EnvGet, sfor, sf
 
 ;MsgBox, New Window: %nw%   sr:%sendr%   sm:%subm%   sf:%sfor%
 
@@ -70,13 +70,7 @@ winactivate ahk_exe chrome.exe
 SFSearch(contentsTrimmed, nw)
 return 
 ;----------------------------------- TRIFORCE SEARCH -------------------------------------------------------------------------------------------------------------
-^+s::
-Clipboard := 
-Send ^c 
-ClipWait 
-thing := Clipboard 
-IXLSearchSetting(thing, nw, sendr, subm, sfor)
-return 
+;Triforce search was moved to an outside script to allow the reloading of itself 
 ;----------------------------------- GOOGLE SEARCH -------------------------------------------------------------------------------------------------------------
 ^+f::
 Clipboard = 
@@ -293,7 +287,7 @@ From here, you can add teachers and decide what subjects will be available to th
 
 ::xactkey::
 (
-Your subscription activation key can be found on your License Information page. To find this page, please do the following:
+Your subscription's activation instructions can be found on your License Information page. To find this page, please do the following:
 
    1. Sign-in to your IXL admin account.
    2. Go to Account Management.
@@ -370,7 +364,7 @@ https://www.ixl.com/help-center/Class-rosters/1274193-can-i-organize-my-students
 )
 
 
-::xacces::
+::xacces_rem::
 (
 You can access your admin account by following this link: 
 )
@@ -462,7 +456,7 @@ I'm just reaching out to check-in on how your IXL account set-up is going.
 
 ::xevan::
 (
-My name is Evan, I am your school's IXL Account Coordinator.
+My name is Evan, I am your school's IXL Account Specialist.
 )
 
 
@@ -482,7 +476,7 @@ Please note that all students' first name, last name, ID, and grade are required
 
 ::xwelcome::
 (
-Welcome to IXL! My name is Evan, I am your school's IXL Account Coordinator. I will be assisting you in getting your students and teachers started with the program. 
+Welcome to IXL! My name is Evan, I am your school's IXL Account Specialist. I will be assisting you in getting your students and teachers started with the program. 
 
 To get started, using an Excel spreadsheet, please compile a roster with the following information in separate columns:
 
@@ -521,5 +515,55 @@ Additionally, I will need a roster of all teachers using IXL this year containin
     - First name 
     - Last name 
     - E-mail 
+)
+
+
+::xhold::
+(
+I hope this e-mail finds you well. I wanted to check-in and see if you had any questions regarding the information we need to create accounts for your students. Since we have not received a student list, your account has automatically gone on hold. Once you upload your list and create student accounts, the hold on your account will be lifted, and your students will be able to practice right away!
+
+I look forward to hearing from you and helping you get started with IXL!
+)
+
+
+::xacces::
+(
+You can access your account and reset the password by following this link: 
+)
+
+
+::xadmin::
+(
+To create an admin account, you will need to do the following: 
+
+     1. Sign-in to your own admin account. 
+     2. Go to Account Management. 
+     3. Go to the "Administrators" page. 
+     4. Click on "Add new administrator."
+     5. Type in the new admin's information and click submit. 
+
+Please note that an admin account is different from a teacher account, and the two cannot be combined. 
+)
+
+
+::cmp::
+(
+completed
+)
+
+
+::xtake::
+(
+I will be taking over for Chris in assisting with your subscription. 
+)
+
+
+::xlausd::
+(
+Per LAUSD Policy, no student data can be directly sent to IXL, so we would need to begin the process of Auto-Rostering through the district if you wanted to update your subscription with new rosters.
+
+
+
+Before we begin that process, I'll need to know how the district should filter your data to fit within your subscription. They can filter by grade, class enrollment, and/or teacher roster based on the information in your SIS. You can let me know how students should be filtered in this e-mail.
 )
 
