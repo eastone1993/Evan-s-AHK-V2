@@ -169,3 +169,38 @@ sleep, 250
 Send {Tab}{Tab}{Tab}{Tab}{Tab}{Tab} ;navigates back to filename bar 
 ;MsgBox, Done
 Return
+
+^+i::
+
+Send !f
+sleep, 250
+ActiveCheck()
+Send i
+sleep, 250
+ActiveCheck()
+Send e
+sleep, 250
+
+ActiveCheck()
+;resets to main window 
+Send {Esc}{Esc}{Esc}
+sleep, 500
+
+
+Send {F12}
+sleep, 250
+
+;saving block 
+Send !d ;moves to address bar 
+sleep, 250
+
+Send ^a
+sleep, 250
+
+Send %A_Desktop%\Rosters ;file path
+Send, {enter}
+sleep, 250
+
+Send {Tab}{Tab}{Tab}{Tab}{Tab}{Tab} ;navigates back to filename bar 
+;MsgBox, Done
+Return

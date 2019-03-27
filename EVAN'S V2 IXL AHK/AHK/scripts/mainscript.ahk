@@ -57,6 +57,11 @@ ExitFunc() {
 FormatTime, CurrentDateTime,, MM/dd/yyyy
 SendInput %CurrentDateTime% + ES--------------------------------------------------------------------------{enter}{enter}{enter}{enter}{Up}{Up}
 Return
+
+:R*?:xtime::
+FormatTime, CurrentTime,, 
+SendInput %CurrentTime%
+return 
 ;----------------------------------- SEARCH FUNCTIONS -------------------------------------------------------------------------------------------------------------
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;----------------------------------- PHONE NUMBER SEARCH -------------------------------------------------------------------------------------------------------------
@@ -101,65 +106,150 @@ Send, ^v
 Send, {enter}
 Clipboard := email
 Return
-;----------------------------------- FETCH -------------------------------------------------------------------------------------------------------------
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;-------------------------------------------------------------------------------------------------------------------------------------------------------
-:?*:xx::
 
-MovePosX := A_ScreenWidth/2
-MovePosY := A_ScreenHeight/2
-
-WinGetActiveTitle, derp 
-Clipboard = 
-Send, ^+{Left}
-Send ^c 
-
-fet := Clipboard
-
-winactivate ahk_exe chrome.exe
-
-
-Loop, 100
+;----------------------------------- REDACTOR -------------------------------------------------------------------------------------------------------------
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;----------------------------------- REDACTOR -------------------------------------------------------------------------------------------------------------
+^+b::
+Send ^c
+sleep 250
+string := Clipboard
+array := []
+Random, rand, 95, 120 
+code := rand-94
+Loop, Parse, string
 {
-   WinGetTitle, Title, A  ;get active window title
-   if(InStr(Title, "Fetch")>0)
-   {
-      GOTO, FETCH ; Terminate the loop
-   }
-   Send ^{Tab}
-   Sleep, 50
+  if (A_LoopField=" ")
+  {
+    array.push(A_LoopField)
+    continue
+  }
+  a := asc(A_LoopField)
+  c := Chr(a-code)
+  ;MsgBox % c
+  array.push(c)
 }
+array.push(Chr(rand))
+;MsgBox % Join("", array)
+op := Join("", array)
+Clipboard := op
+Send ^v
+return 
 
-Exit 
+;----------------------------------- TRANSLATOR -------------------------------------------------------------------------------------------------------------
+^!b::
+Send ^c 
+sleep 250
+string := Clipboard
+array := []
+key := asc(SubStr(string, 0))-94
+newstring := SubStr(string, 1, -1)
+Loop, Parse, newstring
+{
+  if (A_LoopField=" ")
+  {
+    array.push(A_LoopField)
+    continue
+  }
+  a := asc(A_LoopField)
+  c := Chr(a+key)
+  array.push(c)
+} 
+op := Join("", array)
+MsgBox % op 
+return 
 
-FETCH:
-winactivate ahk_exe chrome.exe
-MPY := MovePosY - 264
-MouseClick, left, %MovePosX%, %MPY%
+;----------------------------------- MITEL -------------------------------------------------------------------------------------------------------------
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;----------------------------------- MITEL SIGN-OUT -------------------------------------------------------------------------------------------------------------
+^+o::
+if (state=0)
+  return 
+CoordMode, Mouse, Window ;set to window coord mode
+;winactivate ahk_exe Mitel.exe ;make mitel active window 
+CheckMitelActive()
+WinMove, ahk_exe Mitel.exe,, 50, 50 ;moves window 
+WinGetPos,,, width, height, Mitel Connect ;finds dimensions of mitel window 
+;MsgBox, %width% , %height%
+bheight := height - 53
 
-Send, ^+{Home}
-Send, {BackSpace}
-sleep 100
-;Send, %fet%
-Send, ^v
-Send, {enter}
+CheckMitelActive()
+MouseClick, left, 65, 119
+sleep 250
+CheckMitelActive()
+MouseClick, left, 65, 176
 sleep 250
 
-MouseClick, left, %MovePosX%, %MovePosY%
-
-Loop, 100
+if (width = 212)
 {
-    WinGetActiveTitle, herp
-    ;MsgBox %herp% : %derp%
-    if(InStr(herp, derp)>0)
-    {
-        break 
-    }
-    Send ^{tab}
-    Sleep, 50
+  CheckMitelActive()
+  MouseClick, left, 65, 365
+  sleep 500 
+  CheckMitelActive()
+  MouseClick, left, 245, %bheight%
+}
+else 
+{
+  CheckMitelActive()
+  MouseClick, left, 24, 105
+  sleep 250
+  CheckMitelActive()
+  MouseClick, left, 24, 105
+  sleep 250
+  CheckMitelActive()
+  MouseClick, left, 245, %bheight%
+} 
+
+sleep 1000
+WinMinimize, ahk_exe Mitel.exe
+
+state := 0
+
+return
+
+;----------------------------------- MITEL SIGN-IN -------------------------------------------------------------------------------------------------------------
+!^o::
+
+if (state=1)
+  return 
+CoordMode, Mouse, Window 
+CheckMitelActive()
+WinMove, ahk_exe Mitel.exe,, 50, 50
+WinGetPos,,, 2width, 2height, Mitel Connect 
+b1height := 2height - 53
+
+
+CheckMitelActive()
+MouseClick, left, 65, 119
+sleep 250
+CheckMitelActive()
+MouseClick, left, 65, 145
+sleep 250
+
+if (2width = 212)
+{
+  CheckMitelActive()
+  MouseClick, left, 65, 365
+  sleep 500 
+  CheckMitelActive()
+  MouseClick, left, 245, %b1height%
+}
+Else
+{
+  CheckMitelActive()
+  MouseClick, left, 24, 105
+  sleep 250
+  CheckMitelActive()
+  MouseClick, left, 24, 105
+  sleep 250
+  CheckMitelActive()
+  MouseClick, left, 245, %b1height%
 }
 
-Send, ^v
+sleep 1000
+WinMinimize, ahk_exe Mitel.exe
+
+state := 1
 
 return 
 ;----------------------------------- AHK CODING SCRIPTS -------------------------------------------------------------------------------------------------------------
@@ -219,7 +309,7 @@ WinGetActiveTitle, act
 MsgBox % act 
 return 
 
-CoordMode, Caret, Screen
+;CoordMode, Caret, Screen
 
 :?*:xslack::
 WinActivate, Slack
@@ -232,7 +322,7 @@ if ErrorLevel
     Exit 
 }
 WinActivate, %win%  
-MsgBox, %win% activated
+MsgBox, %win% activated  
 return 
 
 ^+y::
@@ -242,6 +332,30 @@ return
     MovePosY := A_ScreenHeight/2
     MouseMove, %MovePosX% , %MovePosY%
 Return
+
+
+;----------------------------------- FUNCTIONS -------------------------------------------------------------------------------------------------------------
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;----------------------------------- JOIN FUNCTION -------------------------------------------------------------------------------------------------------------
+Join(s,p*) {
+  static _:="".base.Join:=Func("Join")
+  for k,v in p
+  {
+    if isobject(v)
+      for k2, v2 in v
+        o.=s v2
+    else
+      o.=s v
+  }
+  return SubStr(o,StrLen(s)+1)
+}
+;----------------------------------- CHECK MITEL ACTIVE FUNCTION -------------------------------------------------------------------------------------------------------------
+CheckMitelActive() {
+  if !WinActive("ahk_exe Mitel.exe")
+    WinActivate ahk_exe Mitel.exe
+  return 
+}
+
 ;-----------------------------------EOH-------------------------------------------------------------------------------------------------------------
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;-----------------------------------EOH-------------------------------------------------------------------------------------------------------------
@@ -565,5 +679,49 @@ Per LAUSD Policy, no student data can be directly sent to IXL, so we would need 
 
 
 Before we begin that process, I'll need to know how the district should filter your data to fit within your subscription. They can filter by grade, class enrollment, and/or teacher roster based on the information in your SIS. You can let me know how students should be filtered in this e-mail.
+)
+
+
+::yrhu::
+(
+Your roster has been uploaded. 
+)
+
+
+::xwork::
+(
+If you experience any issues when attempting to upload, you can click on "Work with an account specialist" to send us your files. It will also send us an error diagnostic report to troubleshoot any problems with your roster. 
+)
+
+
+::np::
+(
+No problem!
+)
+
+
+::xcalllog::
+(
+Name:
+
+Number:
+
+Time of conversation:
+
+Length of conversation:
+
+Details:
+)
+
+
+::xecor::
+(
+My name is Evan, I am a specialist with the account services department at IXL.
+)
+
+
+::spc::
+(
+see parent case
 )
 

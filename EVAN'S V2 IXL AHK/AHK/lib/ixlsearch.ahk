@@ -8,17 +8,17 @@ ChromeActive() {
     }
     else 
     {
-        ;MsgBox, Chrome Not Active.
-        winactivate ahk_exe chrome.exe  
-        ;exit
-        return  
+        MsgBox, Chrome Not Active.
+        ;winactivate ahk_exe chrome.exe  
+        exit
+        ;return  
     }
 }
 
 OpenNewWindow() { ;ensures that new window is created properly when called 
 	run, "chrome.exe" ;opens new window
 	;sleep 500 ;give time to open window
-	WinWait, New Tab,, 1 ;waits 2 seconds to see if new window is opened
+    WinWait, New Tab,, 1 ;waits 2 seconds to see if new window is opened
 	if ErrorLevel { ;if 2 seconds passes and no window has been opened, retry 
 		i := i+1 ;iteration
 		if (i<=5) { ;iterates no more than 5 times
@@ -150,7 +150,6 @@ IXLSearchSetting(Byref thing, Byref new_window, Byref sr, Byref sm, Byref sf) {
         {
             ;MsgBox, subman runs 
             SubmanSearch(contents, new_window)
-
         }
         ;MsgBox, No subman 
         ;send right setting 
@@ -169,11 +168,18 @@ IXLSearchSetting(Byref thing, Byref new_window, Byref sr, Byref sm, Byref sf) {
         {
             if(sf = true)
             { 
-                SFSearch(thing, new_window)
+                if RegExMatch(thing, "[A]\d{2}[-]", needle)
+                {
+                    Loop, Parse, thing, -
+                    {
+                        if(A_Index=2)
+                            anum := A_LoopField
+                    }
+                    SFSearch(anum, new_window)
+                }              
             }
             SubmanAccountSearch(thing, new_window)
         }
-
         ;send right setting 
         SendRightSearchSetting(sr)
     }
