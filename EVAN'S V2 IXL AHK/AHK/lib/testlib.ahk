@@ -76,9 +76,9 @@ SFSearch(Byref contents, Byref new_window) {
     ChromeActive()
     var1 := "https://ixl.my.salesforce.com/_ui/search/ui/UnifiedSearchResults?searchType=2&sen=0JZ&sen=001&sen=02s&sen=068&sen=003&sen=00T&sen=00U&sen=005&sen=500&sen=00O&str=" . contents
     var2 := var1 . "&isdtp=vw&isWsVw=true&nonce=02541659de9dde0d96e44d154840e14be6f2bb3fcc1022859c569e3e55629581&sfdcIFrameOrigin=https%3A%2F%2Fixl.my.salesforce.com"
-    ClipWait
     ChromeActive()
     Clipboard := var2
+    ClipWait
     sleep, 500 ;wait for page to load
     ChromeActive()
     Send, ^v
@@ -94,6 +94,7 @@ SubmanSearch(Byref contents, Byref new_window) {
     sleep 150
     ChromeActive()
     Clipboard := "https://secure.quia.com/actions/subManager/search/sub"
+    Clipwait
     ChromeActive()
     Send, ^v
     Send, {enter}
@@ -116,10 +117,9 @@ SubmanSearch(Byref contents, Byref new_window) {
 SubmanAccountSearch(Byref contents, Byref new_window) {
     NewWindowSetting(new_window)
     ChromeActive()
-    ;contents := Trim(contents)
-    Variable := "https://secure.quia.com/actions/subManager/account/view/" . contents
-    ClipWait    
+    Variable := "https://secure.quia.com/actions/subManager/account/view/" . contents    
     Clipboard := Variable
+    Clipwait
     sleep, 500
     ChromeActive()
     Send, ^v
@@ -131,8 +131,8 @@ SubmanAccountSearch(Byref contents, Byref new_window) {
 QuiaSearch(Byref contents, Byref new_window) {
     NewWindowSetting(new_window)
     Variable := "https://secure.quia.com/servlets/quia.internal.userInfo.UserInfo?logicModule=1&email=" . contents
-    ClipWait
     Clipboard := Variable
+    Clipwait
     ChromeActive()
     Send, ^v
     Send, {enter}
@@ -142,17 +142,17 @@ QuiaSearch(Byref contents, Byref new_window) {
 
 UserSearch(Byref contents, Byref new_window) {
     NewWindowSetting(new_window)
-    page := "https://secure.quia.com/servlets/quia.internal.userInfo.UserInfo?logicModule=1&username=" . contents
+    page := "https://secure.quia.com/servlets/quia.internal.userInfo.UserInfo?logicModule=1&username=" . needle
     Clipboard := page
     Clipwait 
-    ChromeActive()
+    Send ^t 
     Send, ^v
     Send, {enter}
     return
 }
 
 IXLSearchSetting(Byref thing, Byref new_window, Byref sr, Byref sm, Byref sf) {
-    thing := Trim(thing)
+    
     new_window_setting := new_window ;saves new_window's mode 
     if RegExMatch(thing, "[\w-_.]+@(?:\w+(?::\d+)?\.){1,3}(?:\w+\.?){1,2}", contents) {
         QuiaSearch(contents, new_window)
@@ -167,40 +167,35 @@ IXLSearchSetting(Byref thing, Byref new_window, Byref sr, Byref sm, Byref sf) {
         ;send right setting 
         ;SendRightSearchSetting(sr)
     }
-    else if RegExMatch(thing, "[A]\d{2}[-]", needle) ;account number with prefix
-    {
-        if(sf = true)
-        {
-           Loop, Parse, thing, -
-            {
-                if(A_Index=2)
-                    anum := A_LoopField
-            }
-            SFSearch(anum, new_window) 
-        }
-        SubmanAccountSearch(thing, new_window)
-    }
-    else if RegExMatch(thing, "\b[0-9]+") ;account or case number
-    {
-        Length := StrLen(thing)
-        ;MsgBox, %thing% %Length%
-        if (Length=8) ;CASE NUMBERS ARE 8 DIGITS ALWAYS
-            SFSearch(thing, new_window)
-        else                            ;account number without prefix 
-        {
-            if(sf = true)
-                SFSearch(thing, new_window)
-            SubmanAccountSearch(thing, new_window)
-        }   
-    }
-    else if RegExMatch(thing, "\w+[@]\w+|\w+", needle)  ;username 
+    else if RegExMatch(thing, "\w+[@]\w+|\w+", needle)
     {
         userSearch(needle, new_window)
     }
     else 
     {
-        MsgBox, Not a searchable item!
-        return 
+        Length := StrLen(thing)
+        ;MsgBox, %thing% %Length%
+        if (Length=8) ;CASE NUMBERS ARE 8 DIGITS ALWAYS
+        {
+            SFSearch(thing, new_window)
+            ;MsgBox, case number 
+        }
+        else ;ACCOUNT NUMBER WITHOUT PREFIX
+        {
+            if(sf = true)
+            { 
+                if RegExMatch(thing, "[A]\d{2}[-]", needle)
+                {
+                    Loop, Parse, thing, -
+                    {
+                        if(A_Index=2)
+                            anum := A_LoopField
+                    }
+                    SFSearch(anum, new_window)
+                }              
+            }
+            SubmanAccountSearch(thing, new_window)
+        }
     }
 
     SendRightSearchSetting(sr)

@@ -1,7 +1,89 @@
 #SingleInstance, force 
 #Persistent
 
+;----------------------------------- REDACTOR -------------------------------------------------------------------------------------------------------------
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;----------------------------------- REDACTOR -------------------------------------------------------------------------------------------------------------
 
+alpha_arr := ["0","1","a","b","c","d","e","f","g","h","i","2","3","A","B","C","D","E","F","G","H","I","4","5","j","k","l","m","n","o","p","q","6","7","J","K","L","M","N","O","P","Q","8","9","r","s","t","u","v","w","x","y","z"," ","!","R","S","T","U","V","W","X","Y","Z","@","#","$","%","^","&","*","(",")","-","_","+","=","`","~","{","}","[","]","\","|",";",":","'",",",".","/","?",">","<"] 
+
+^+a::
+Send ^c
+sleep 250
+string := Clipboard
+array := []
+Random, rand, 1, 93
+;MsgBox rand: %rand%
+Loop, Parse, string
+{
+  alpha_coord := GetIndexOf(A_LoopField, alpha_arr)
+  code_coord := alpha_coord - rand 
+  if (code_coord < 1)
+    code_coord := code_coord + 94
+  array.push(alpha_arr[code_coord])
+}
+array.push(alpha_arr[rand])
+;MsgBox % Join("", array)
+op := Join("", array)
+Clipboard := op
+Send ^v
+return 
+    
+;----------------------------------- TRANSLATOR -------------------------------------------------------------------------------------------------------------
+^!a::
+Send ^c 
+sleep 250
+string := Clipboard
+array := []
+;key := asc(SubStr(string, 0))-94
+key_char := SubStr(string, 0)
+;MsgBox key_char: %key_char%
+key_val := GetIndexOf(key_char, alpha_arr) 
+;MsgBox key_val: %key_val%
+newstring := SubStr(string, 1, -1)
+;MsgBox newstring: %newstring%
+
+Loop, Parse, newstring
+{
+  ;MsgBox % A_LoopField
+  alpha_coord := GetIndexOf(A_LoopField, alpha_arr)
+  ;MsgBox alpha_coord: %alpha_coord%
+  code_coord := alpha_coord + key_val
+  ;MsgBox code_coord: %code_coord%
+  if (code_coord > 94)
+  {
+    code_coord := code_coord - 94
+    ;MsgBox code_coord_mod: %code_coord%
+  }
+  ;MsgBox % alpha_arr[code_coord]
+  array.push(alpha_arr[code_coord])
+} 
+op := Join("", array)
+MsgBox % op 
+return 
+
+
+Join(s,p*) {
+  static _:="".base.Join:=Func("Join")
+  for k,v in p
+  {
+    if isobject(v)
+      for k2, v2 in v
+        o.=s v2
+    else
+      o.=s v
+  }
+  return SubStr(o,StrLen(s)+1)
+}
+
+GetIndexOf(e, arr) {
+  for index, elem in arr
+  {
+    if (elem == e)
+      return A_Index 
+  }
+  return 0
+}
 /*
 ^+b::
 

@@ -110,50 +110,59 @@ Return
 ;----------------------------------- REDACTOR -------------------------------------------------------------------------------------------------------------
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;----------------------------------- REDACTOR -------------------------------------------------------------------------------------------------------------
+
 ^+b::
+alpha_arr := ["0","1","a","b","c","d","e","f","g","h","i","2","3","A","B","C","D","E","F","G","H","I","4","5","j","k","l","m","n","o","p","q","6","7","J","K","L","M","N","O","P","Q","8","9","r","s","t","u","v","w","x","y","z"," ","!","R","S","T","U","V","W","X","Y","Z","@","#","$","%","^","&","*","(",")","-","_","+","=","`","~","{","}","[","]","\","|",";",":","'",",",".","/","?",">","<"] 
 Send ^c
 sleep 250
 string := Clipboard
 array := []
-Random, rand, 95, 120 
-code := rand-94
+Random, rand, 1, 93
+;MsgBox rand: %rand%
 Loop, Parse, string
 {
-  if (A_LoopField=" ")
-  {
-    array.push(A_LoopField)
-    continue
-  }
-  a := asc(A_LoopField)
-  c := Chr(a-code)
-  ;MsgBox % c
-  array.push(c)
+  alpha_coord := GetIndexOf(A_LoopField, alpha_arr)
+  code_coord := alpha_coord - rand 
+  if (code_coord < 1)
+    code_coord := code_coord + 94
+  array.push(alpha_arr[code_coord])
 }
-array.push(Chr(rand))
+array.push(alpha_arr[rand])
 ;MsgBox % Join("", array)
 op := Join("", array)
 Clipboard := op
 Send ^v
 return 
-
+    
 ;----------------------------------- TRANSLATOR -------------------------------------------------------------------------------------------------------------
 ^!b::
+alpha_arr := ["0","1","a","b","c","d","e","f","g","h","i","2","3","A","B","C","D","E","F","G","H","I","4","5","j","k","l","m","n","o","p","q","6","7","J","K","L","M","N","O","P","Q","8","9","r","s","t","u","v","w","x","y","z"," ","!","R","S","T","U","V","W","X","Y","Z","@","#","$","%","^","&","*","(",")","-","_","+","=","`","~","{","}","[","]","\","|",";",":","'",",",".","/","?",">","<"] 
 Send ^c 
 sleep 250
 string := Clipboard
 array := []
-key := asc(SubStr(string, 0))-94
+;key := asc(SubStr(string, 0))-94
+key_char := SubStr(string, 0)
+;MsgBox key_char: %key_char%
+key_val := GetIndexOf(key_char, alpha_arr) 
+;MsgBox key_val: %key_val%
 newstring := SubStr(string, 1, -1)
+;MsgBox newstring: %newstring%
+
 Loop, Parse, newstring
 {
-  if (A_LoopField=" ")
+  ;MsgBox % A_LoopField
+  alpha_coord := GetIndexOf(A_LoopField, alpha_arr)
+  ;MsgBox alpha_coord: %alpha_coord%
+  code_coord := alpha_coord + key_val
+  ;MsgBox code_coord: %code_coord%
+  if (code_coord > 94)
   {
-    array.push(A_LoopField)
-    continue
+    code_coord := code_coord - 94
+    ;MsgBox code_coord_mod: %code_coord%
   }
-  a := asc(A_LoopField)
-  c := Chr(a+key)
-  array.push(c)
+  ;MsgBox % alpha_arr[code_coord]
+  array.push(alpha_arr[code_coord])
 } 
 op := Join("", array)
 MsgBox % op 
@@ -349,6 +358,15 @@ Join(s,p*) {
   }
   return SubStr(o,StrLen(s)+1)
 }
+;----------------------------------- GET INDEX FUNCTION -------------------------------------------------------------------------------------------------------------
+GetIndexOf(e, arr) {
+  for index, elem in arr
+  {
+    if (elem == e)
+      return A_Index 
+  }
+  return 0
+}
 ;----------------------------------- CHECK MITEL ACTIVE FUNCTION -------------------------------------------------------------------------------------------------------------
 CheckMitelActive() {
   if !WinActive("ahk_exe Mitel.exe")
@@ -478,12 +496,6 @@ https://www.ixl.com/help-center/Class-rosters/1274193-can-i-organize-my-students
 )
 
 
-::xacces_rem::
-(
-You can access your admin account by following this link: 
-)
-
-
 ::xinfo::
 (
 https://www.ixl.com/admin/license
@@ -592,6 +604,8 @@ Please note that all students' first name, last name, ID, and grade are required
 (
 Welcome to IXL! My name is Evan, I am your school's IXL Account Specialist. I will be assisting you in getting your students and teachers started with the program. 
 
+We currently have August 1, 2019 set as your first day of school. If this is incorrect, please let me know of the correct date so that I may update that in our system.
+
 To get started, using an Excel spreadsheet, please compile a roster with the following information in separate columns:
 
     - First name
@@ -611,6 +625,8 @@ Additionally, I will need a roster of all teachers using IXL this year containin
 If a teacher has a trial account, please exclude them from the teacher list. I will send instructions on how to merge their trial account once the subscription is activated. 
 
 Once the file is ready, please submit it to our secure uploading page using the following link: https://www.ixl.com/admin/upload-roster
+
+If you are having trouble uploading your file, please feel free to use the "Work with an account specialist" button to request help, and I will be happy to assist you with the process. 
 
 I look forward to hearing from you and helping you get started with IXL!
 )
@@ -723,5 +739,40 @@ My name is Evan, I am a specialist with the account services department at IXL.
 ::spc::
 (
 see parent case
+)
+
+
+::xlausdsetup::
+(
+Welcome to IXL! My name is Evan, and I will be your account specialist. I’ll be the one helping you set up rosters for your IXL subscription going forward. 
+
+Per LAUSD Policy, no student data can be directly sent to IXL, so we would need to begin the process of Auto-Rostering through the district if you wanted to update your subscription with new rosters. 
+
+Before we begin that process, I'll need to know how the district should filter your data to fit within your subscription. They can filter by grade, class enrollment, and/or teacher roster based on the information in your SIS. You can let me know how students should be filtered in this e-mail.
+
+)
+
+
+::xclever::
+(
+In an effort to support key customers for whom Clever integration is a non-negotiable requirement, we have put in place a limited-basis agreement with Clever. This means that we will offer Clever integration for a few pre-approved customers only. 
+)
+
+
+::xjackson::
+(
+Hi jackson
+)
+
+
+::xtara::
+(
+Your subscription's activation instructions can be found on your License Information page. To find this page, please do the following:
+
+   1. Sign-in to your IXL admin account.
+   2. Go to Account Management.
+   3. Click on 'License Info'
+
+From here, you can see various pieces of information about your subscription. In the Subscription information section, underneath your school's renewal date, you will find the set-up for Teacher accounts that have already been using IXL. You can simply e-mail them the Activation Instructions, and it will send your subscription's activation key, along with instructions on how to correctly set-up their account. 
 )
 
